@@ -1,0 +1,48 @@
+version: "2"
+services:
+  mongodb:
+    image: mongo:4.2.0
+    container_name: mongodb
+    environment:
+      - MONGO_DATA_DIR=/data/db
+#        - MONGO_LOG_DIR=/dev/null
+#        - MONGODB_USER="user" 
+#        - MONGODB_PASS="pass"
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+#      command: mongod --smallfiles --logpath=/dev/null # --quiet
+#  mysql:
+#    image: mysql:5.7
+#    container_name: mysql
+#    ports:
+#      - 3306:3306
+#    volumes:
+#      - .volumes/mysql/data:/var/lib/mysql
+#      - .volumes/mysql/tmp:/tmp/mysql
+#    environment:
+#      - MYSQL_DATABASE=omega
+#      - MYSQL_ROOT_PASSWORD=12345
+  rabbitmq:
+    image: rabbitmq:3.7.17
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "12345"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - 15672:15672
+      - 5672:5672
+#    volumes:
+#      - ./enabled_plugins:/etc/rabbitmq/enabled_plugins
+
+#  els:
+#    image: elasticsearch:2.3.0
+#    container_name: elasticsearch
+#    ports:
+#      - 9200:9200
+#      - 9300:9300
+#    volumes:
+#      - .volumes/els/data:/usr/share/elasticsearch/data
