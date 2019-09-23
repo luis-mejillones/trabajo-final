@@ -1,0 +1,19 @@
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+    <persistence-unit name="cassandra_pu">
+        <provider>com.impetus.kundera.KunderaPersistence</provider>
+        <class>model.Kudos</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+        <properties>
+            <property name="kundera.nodes" value="172.18.0.5"/>
+            <property name="kundera.port" value="9042"/>
+            <property name="kundera.keyspace" value="omega"/>
+            <property name="kundera.username" value="cassandra"/>
+            <property name="kundera.password" value="cassandra"/>
+            <!--<property name="kundera.dialect" value="cassandra"/>-->
+            <!--<property name="kundera.ddl.auto.prepare" value="create" />-->
+            <property name="kundera.client.lookup.class" value="com.impetus.kundera.client.cassandra.dsdriver.DSClientFactory" />
+        </properties>
+    </persistence-unit>
+</persistence>

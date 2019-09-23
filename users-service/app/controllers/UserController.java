@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import model.Kudos;
 import model.User;
+import org.bson.Document;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -29,13 +30,13 @@ public class UserController extends Controller {
 
         User user = Json.mapper().treeToValue(json, User.class);
         User out = this.service.create(user);
-
         JsonNode content = Json.toJson(out);
+
         return created(content);
     }
 
     public Result getAll() {
-        List<User> list = this.service.getAll();
+        List<Document> list = this.service.getAll();
         JsonNode content =  Json.toJson(list);
 
         return ok(content);
@@ -58,7 +59,7 @@ public class UserController extends Controller {
         return ok(user);
     }
 
-    public Result delete(Integer id) {
+    public Result delete(String id) {
         this.service.delete(id);
 
         return ok();

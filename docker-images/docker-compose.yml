@@ -12,6 +12,28 @@ services:
       - ./data/db:/data/db
     ports:
       - 27017:27017
+  fix-cassandra-permissions:
+    image: bitnami/cassandra:latest
+    user: root
+    command: chown -R 1001:1001 /bitnami
+    volumes:
+      - ./data/:/bitnami
+  cassandra:
+    depends_on:
+      - fix-cassandra-permissions
+    restart: on-failure
+    image: bitnami/cassandra:latest
+    volumes:
+      - ./data/:/bitnami
+#    network_mode: host
+    ports:
+      - 7000:7000
+      - 9042:9042
+    environment:
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=12345
+    container_name: cassandra
+
 #      command: mongod --smallfiles --logpath=/dev/null # --quiet
 #  mysql:
 #    image: mysql:5.7

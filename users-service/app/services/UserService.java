@@ -1,38 +1,61 @@
 package services;
 
 import akka.japi.Pair;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import model.Kudos;
 import model.User;
+import org.bson.Document;
 import org.springframework.util.StringUtils;
 import play.Logger;
+import util.Constants;
 import util.message.Message;
 import util.message.MessageType;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import static com.mongodb.client.model.Filters.eq;
 
 
 public class UserService {
     private KudosService kudosService;
     private MessageSender messageSender;
+    private MongoClient mongoClient;
+    private MongoDatabase database;
+    private MongoCollection<Document> collection;
 
     @Inject
     public UserService(KudosService kudosService, MessageSender messageSender) {
         this.kudosService = kudosService;
         this.messageSender = messageSender;
+        this.mongoClient = new MongoClient(Constants.MONGODB_HOST , Constants.MONGODB_PORT );
+        this.database = this.mongoClient.getDatabase(Constants.MONGODB_DATABASE);
+        this.collection = this.database.getCollection(Constants.MONGODB_COLLECTION);
+
     }
 
     public User create(User user) {
+        user.id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+        Document doc = user.toDocument();
+        this.collection.insertOne(doc);
+        Logger.info(">>> User created with id: " + user.id);
+
+
 //        user.save();
-        Logger.info("User created with id: " + user.id);
+//        Logger.info("User created with id: " + user.id);
 
         return user;
     }
 
-    public List<User> getAll() {
-        List<User> list = new ArrayList<>();
-        Logger.info("Users retrieved: " + list.size());
+    public List<Document> getAll() {
+        MongoCursor<Document> cursor = this.collection.find().iterator();
+        List<Document> list = this.retrieveDocuments(cursor);
+        Logger.info(">>> Users retrieved: " + list.size());
 
         return list;
     }
@@ -54,8 +77,9 @@ public class UserService {
         return new Pair<>(new User(), new ArrayList<>());
     }
 
-    public void delete(Integer id) {
-//        User.find.ref(id).delete();
+    public void delete(String id) {
+        this.collection.deleteOne(eq("_id", id));
+//ToDo Enable send message to remove liked kudos
 //        this.sendMessage(MessageType.DELETE_USER, id.toString());
         Logger.info("User delete with id: " + id);
     }
@@ -142,5 +166,18 @@ public class UserService {
         user.kudosQty++;
 //        user.update();
         Logger.info(">>> Kudos incremented for targetId:" + kudos.targetId + " to " + user.kudosQty);
+    }
+
+    private List<Document> retrieveDocuments(MongoCursor<Document> cursor) {
+        List<Document> list = new ArrayList<>();
+        try {
+            while (cursor.hasNext()) {
+                list.add(cursor.next());
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return list;
     }
 }
