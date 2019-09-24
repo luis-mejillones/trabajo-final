@@ -1,0 +1,19 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# An example controller showing a sample home page
+GET     /                           controllers.HomeController.index
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+################# Kudos Controller ###############
+#POST /stats/create               controllers.StatsController.create()
+#POST /stats/delete/:id           controllers.StatsController.delete(id: Integer)
+
+#GET  /stats/list                 controllers.StatsController.getAll()
+#GET  /stats/find                 controllers.StatsController.find()
+#GET  /stats/:id                  controllers.StatsController.getById(id: Integer)
+
+GET  /stats/test                  controllers.StatsController.test()
