@@ -22,10 +22,10 @@ public class KudosService {
 
     }
 
-    public List<Kudos> getKudos(Integer userId) {
+    public List<Kudos> getKudos(String userId) {
         HttpClient httpclient = HttpClientBuilder.create().build();
         try {
-            HttpHost target = new HttpHost("localhost", 9002, "http");
+            HttpHost target = new HttpHost("localhost", 9102, "http");
             HttpGet getRequest = new HttpGet("/kudos/target/" + userId);
 
             Logger.info("executing request to " + target);
@@ -47,5 +47,22 @@ public class KudosService {
         }
 
         return new ArrayList<>();
+    }
+
+    public void deleteByUserId(String userId) {
+        HttpClient httpclient = HttpClientBuilder.create().build();
+        String uri = String.format("/stats/user/%s/delete", userId);
+        try {
+            HttpHost target = new HttpHost("localhost", 9103, "http");
+            HttpGet getRequest = new HttpGet(uri);
+
+            Logger.info("[Delete Kudos] Borrar kudos para el usuario: " + userId);
+
+            HttpResponse httpResponse = httpclient.execute(target, getRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            httpclient.getConnectionManager().shutdown();
+        }
     }
 }

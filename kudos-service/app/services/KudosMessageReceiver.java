@@ -10,14 +10,14 @@ import util.message.Message;
 
 import javax.inject.Inject;
 
-public class MessageReceiver {
+public class KudosMessageReceiver {
 
     private final KudosService kudosService;
 
     @Inject
-    public MessageReceiver(final KudosService kudosService) throws Exception {
+    public KudosMessageReceiver(final KudosService kudosService) throws Exception {
         this.kudosService = kudosService;
-        Logger.info(">>> MessageReceiver is starting up...");
+        Logger.info("[Kudos Queue] Arrancando el servicio KudosMessageReceiver...");
         this.setup();
     }
 
@@ -30,16 +30,16 @@ public class MessageReceiver {
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        channel.queueDeclare(Constants.USERS_QUEUE, false, false, false, null);
-        Logger.info(">>> Waiting for messages...");
+        channel.queueDeclare(Constants.KUDOS_QUEUE, false, false, false, null);
+        Logger.info("[Kudos Queue] Esperando mensajes...");
 
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
             String message = new String(delivery.getBody(), "UTF-8");
-            Logger.info("<<< Received '" + message + "'");
+            Logger.info("[Kudos Queue] Mensaje recibido: '" + message + "'");
             this.process(message);
         };
 
-        channel.basicConsume(Constants.USERS_QUEUE, true, deliverCallback, consumerTag -> { });
+        channel.basicConsume(Constants.KUDOS_QUEUE, true, deliverCallback, consumerTag -> { });
     }
 
     private void process(String msg) {
@@ -54,10 +54,10 @@ public class MessageReceiver {
 
         switch (message.getMessageType()) {
             case DELETE_USER:
-                this.kudosService.deleteByUserId(Integer.parseInt(message.getContent()));
+                this.kudosService.deleteByUserId(message.getContent());
                 break;
             default:
-                Logger.warn(">>> Unknown message type: '" + message.getMessageType() + "'");
+                Logger.warn("[Kudos Queue] Message type desconocido: '" + message.getMessageType() + "'");
         }
     }
 }

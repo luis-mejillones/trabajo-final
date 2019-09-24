@@ -14,7 +14,7 @@ CREATE TABLE kudos (
     date text,
 	place text,
     content text,
-    target_id int,
-    source_id int
+    target_id text,
+    source_id text
 );
 

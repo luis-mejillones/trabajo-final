@@ -1,5 +1,5 @@
 import com.google.inject.AbstractModule;
-import services.MessageReceiver;
+import services.KudosMessageReceiver;
 
 import java.time.Clock;
 
@@ -20,7 +20,7 @@ public class Module extends AbstractModule {
         // Use the system clock as the default implementation of Clock
         bind(Clock.class).toInstance(Clock.systemDefaultZone());
 
-        bind(MessageReceiver.class).asEagerSingleton();
+        bind(KudosMessageReceiver.class).asEagerSingleton();
     }
 
 }

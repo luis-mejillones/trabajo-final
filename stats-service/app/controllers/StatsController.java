@@ -11,64 +11,70 @@ import model.User;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
-import services.UserService;
+import services.StatsService;
 
 import javax.inject.Inject;
 import java.util.List;
 
 public class StatsController extends Controller {
-    private final UserService service;
+    private final StatsService service;
 
     @Inject
-    public StatsController(final UserService service) {
+    public StatsController(StatsService service) {
         this.service = service;
     }
 
-    public Result create() throws Exception {
-        JsonNode json = request().body().asJson();
-        if (json == null) {
-            return badRequest("Expecting Json data");
-        }
-
-        User user = Json.mapper().treeToValue(json, User.class);
-        User out = this.service.create(user);
-
-        JsonNode content = Json.toJson(out);
-        return created(content);
-    }
-
-    public Result getAll() {
-        List<User> list = this.service.getAll();
-        JsonNode content =  Json.toJson(list);
-
-        return ok(content);
-    }
-
-    public Result getById(Integer id) {
-        Pair<User, List<Kudos>> pair = this.service.getById(id);
-        JsonNode user = Json.toJson(pair.first());
-        JsonNode kudos = Json.toJson(pair.second());
-
-        ((ObjectNode)user).set("kudos", kudos);
-
-        return ok(user);
-    }
-
-    public Result delete(Integer id) {
-        this.service.delete(id);
+    public Result deleteByUserId(String userId) {
+        this.service.deleteByUserId(userId);
 
         return ok();
     }
 
-    public Result find() {
-        String nickname = request().getQueryString("nickname");
-        String name = request().getQueryString("name");
-        List<User> list = this.service.find(nickname, name);
+//    public Result create() throws Exception {
+//        JsonNode json = request().body().asJson();
+//        if (json == null) {
+//            return badRequest("Expecting Json data");
+//        }
+//
+//        User user = Json.mapper().treeToValue(json, User.class);
+//        User out = this.service.create(user);
+//
+//        JsonNode content = Json.toJson(out);
+//        return created(content);
+//    }
 
-        JsonNode content =  Json.toJson(list);
+//    public Result getAll() {
+//        List<User> list = this.service.getAll();
+//        JsonNode content =  Json.toJson(list);
+//
+//        return ok(content);
+//    }
 
-        return ok(content);
-    }
+//    public Result getById(Integer id) {
+//        Pair<User, List<Kudos>> pair = this.service.getById(id);
+//        JsonNode user = Json.toJson(pair.first());
+//        JsonNode kudos = Json.toJson(pair.second());
+//
+//        ((ObjectNode)user).set("kudos", kudos);
+//
+//        return ok(user);
+//    }
+
+//    public Result delete(Integer id) {
+//        this.service.delete(id);
+//
+//        return ok();
+//    }
+
+//    public Result find() {
+//        String nickname = request().getQueryString("nickname");
+//        String name = request().getQueryString("name");
+//        List<User> list = this.service.find(nickname, name);
+//
+//        JsonNode content =  Json.toJson(list);
+//
+//        return ok(content);
+//    }
 
     public Result testmq() throws Exception {
         String QUEUE_NAME = "hello";

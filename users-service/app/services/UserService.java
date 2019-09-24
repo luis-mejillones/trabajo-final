@@ -1,6 +1,7 @@
 package services;
 
 import akka.japi.Pair;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
@@ -10,6 +11,8 @@ import model.User;
 import org.bson.Document;
 import org.springframework.util.StringUtils;
 import play.Logger;
+import play.libs.Json;
+import play.mvc.Result;
 import util.Constants;
 import util.message.Message;
 import util.message.MessageType;
@@ -20,18 +23,20 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.mongodb.client.model.Filters.eq;
+import static play.mvc.Results.badRequest;
+import static play.mvc.Results.created;
 
 
 public class UserService {
-    private KudosService kudosService;
     private MessageSender messageSender;
     private MongoClient mongoClient;
     private MongoDatabase database;
     private MongoCollection<Document> collection;
+    private StatsService statsService;
 
     @Inject
-    public UserService(KudosService kudosService, MessageSender messageSender) {
-        this.kudosService = kudosService;
+    public UserService(StatsService statsService, MessageSender messageSender) {
+        this.statsService = statsService;
         this.messageSender = messageSender;
         this.mongoClient = new MongoClient(Constants.MONGODB_HOST , Constants.MONGODB_PORT );
         this.database = this.mongoClient.getDatabase(Constants.MONGODB_DATABASE);
@@ -39,17 +44,18 @@ public class UserService {
 
     }
 
-    public User create(User user) {
+    public Result create(User user) {
+        List<Document> list = this.getByNickname(user.nickname);
+        if (list.size() > 0) {
+            return badRequest("Nickname repetido.");
+        }
         user.id = UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
         Document doc = user.toDocument();
         this.collection.insertOne(doc);
-        Logger.info(">>> User created with id: " + user.id);
+        JsonNode content = Json.toJson(user);
+        Logger.info("[Create User] Usuario creado con id: " + user.id);
 
-
-//        user.save();
-//        Logger.info("User created with id: " + user.id);
-
-        return user;
+        return created(content);
     }
 
     public List<Document> getAll() {
@@ -60,11 +66,24 @@ public class UserService {
         return list;
     }
 
-    public User getById(Integer id) {
+    public User getById(String id) {
         User out = new User();
-        Logger.info("User find by id: " + out.id);
+        MongoCursor<Document> cursor = this.collection.find(eq("_id", id)).iterator();
+        if (cursor.hasNext()) {
+            out.fromDocument(cursor.next());
+        }
+
+        Logger.info("[Get User] Recuperar ususario con id: " + out.id);
 
         return out;
+    }
+
+    public List<Document> getByNickname(String nickname) {
+        MongoCursor<Document> cursor = this.collection.find(eq("nickname", nickname)).iterator();
+        List<Document> list = this.retrieveDocuments(cursor);
+        Logger.info("[Get Users] Usuarios recuperados por nickname '" + nickname + "' #" + list.size());
+
+        return list;
     }
 
     public Pair<User, List<Kudos>> getDetailById(Integer id) {
@@ -79,9 +98,8 @@ public class UserService {
 
     public void delete(String id) {
         this.collection.deleteOne(eq("_id", id));
-//ToDo Enable send message to remove liked kudos
-//        this.sendMessage(MessageType.DELETE_USER, id.toString());
-        Logger.info("User delete with id: " + id);
+        this.statsService.deleteByUserId(id);
+        Logger.info("[Delete User] Usuario borrado id: " + id);
     }
 
     public List<User> find(String nickname, String name) {
@@ -153,19 +171,19 @@ public class UserService {
     }
 
     public void updateKudosQty(String msg) {
-        Kudos kudos = new Kudos();
-        try {
-            kudos.fromString(msg);
-        } catch (Exception e) {
-            Logger.error(">>> Error parsing received message: '" + msg + "' " + e.getMessage());
-
-            return;
-        }
-
-        User user = this.getById(kudos.targetId);
-        user.kudosQty++;
-//        user.update();
-        Logger.info(">>> Kudos incremented for targetId:" + kudos.targetId + " to " + user.kudosQty);
+//        Kudos kudos = new Kudos();
+//        try {
+//            kudos.fromString(msg);
+//        } catch (Exception e) {
+//            Logger.error(">>> Error parsing received message: '" + msg + "' " + e.getMessage());
+//
+//            return;
+//        }
+//
+//        User user = this.getById(kudos.targetId);
+//        user.kudosQty++;
+////        user.update();
+//        Logger.info(">>> Kudos incremented for targetId:" + kudos.targetId + " to " + user.kudosQty);
     }
 
     private List<Document> retrieveDocuments(MongoCursor<Document> cursor) {

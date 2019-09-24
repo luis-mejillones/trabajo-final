@@ -11,7 +11,7 @@ public class KudosMessageSender {
     private ConnectionFactory factory;
 
     public KudosMessageSender() {
-        Logger.info(">>> KudosMessageSender service is starting...");
+        Logger.info("[Queue Service] arrancando el servicio KudosMessageSender...");
         this.setup();
     }
 
@@ -31,10 +31,10 @@ public class KudosMessageSender {
                 channel.queueDeclare(Constants.KUDOS_QUEUE, false, false, false, null);
                 channel.basicPublish("", Constants.KUDOS_QUEUE, null, msg.getBytes("UTF-8"));
 
-                Logger.info(">>> Sent Kudos '" + msg + "'");
+                Logger.info("[Queue Message] Enviar mensaje: " + msg);
             }
         } catch (Exception e) {
-            Logger.error(">>> Error: " + e.getMessage());
+            Logger.error("[Queue Error] " + e.getMessage());
         }
     }
 }

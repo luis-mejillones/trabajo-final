@@ -29,10 +29,8 @@ public class UserController extends Controller {
         }
 
         User user = Json.mapper().treeToValue(json, User.class);
-        User out = this.service.create(user);
-        JsonNode content = Json.toJson(out);
 
-        return created(content);
+        return this.service.create(user);
     }
 
     public Result getAll() {
@@ -42,7 +40,7 @@ public class UserController extends Controller {
         return ok(content);
     }
 
-    public Result getById(Integer id) {
+    public Result getById(String id) {
         User user = this.service.getById(id);
         JsonNode content = Json.toJson(user);
 

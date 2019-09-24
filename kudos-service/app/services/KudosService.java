@@ -4,6 +4,8 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
+import com.datastax.driver.core.querybuilder.Delete;
+import com.datastax.driver.core.querybuilder.QueryBuilder;
 import com.impetus.client.cassandra.common.CassandraConstants;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -120,12 +122,38 @@ public class KudosService {
         return list;
     }
 
-    public void deleteByUserId(Integer userId) {
-        DeleteResult result = this.collection.deleteMany(eq("targetId", userId));
-        Logger.info(">>> Deleting target Kudos for userId: " + userId + " Result: " + result.toString());
+    public void deleteByUserId(String userId) {
+        EntityManager em = this.getEmf().createEntityManager();
 
-        result = this.collection.deleteMany(eq("sourceId", userId));
-        Logger.info(">>> Deleting source Kudos for userId: " + userId + " Result: " + result.toString());
+        List<Kudos> list = this.getKudosByUserId(userId, "target_id");
+        list.stream().forEach(item -> {
+            Kudos kudos = em.find(Kudos.class, item.id);
+            em.remove(kudos);
+        });
+        Logger.info("[Delete Kudos] Borrar kudos para el usuario destino con id: " + userId + " #kudos " + list.size());
+
+        list = this.getKudosByUserId(userId, "source_id");
+        list.stream().forEach(item -> {
+            Kudos kudos = em.find(Kudos.class, item.id);
+            em.remove(kudos);
+        });
+        Logger.info("[Delete Kudos] Borrar kudos para el usuario origen con id: " + userId + " #kudos " + list.size());
+    }
+
+    private List<Kudos> getKudosByUserId(String userId, String field) {
+        List<Kudos> list = new ArrayList<>();
+        Session session = this.getSession();
+
+        String query = String.format("SELECT * FROM omega.kudos WHERE %s='%s' ALLOW FILTERING;", field, userId);
+        ResultSet rs = session.execute(query);
+        List<Row> rows = rs.all();
+        rows.stream().forEach(row -> {
+            Kudos kudos = new Kudos();
+            kudos.fromRow(row);
+            list.add(kudos);
+        });
+
+        return list;
     }
 
     public void sendMessage(MessageType type, String message) {

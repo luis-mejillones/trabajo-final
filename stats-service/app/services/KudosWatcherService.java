@@ -33,18 +33,18 @@ public class KudosWatcherService {
     }
 
     private void process() {
-        Executors.newCachedThreadPool().submit(() -> {
-            try {
-                while (true) {
-                    this.checkKudos();
-                    Thread.sleep(1000);
-                }
-            } catch (Exception e) {
-                Logger.error(">>> Error: " + e.getMessage());
-            }
-        });
-
-        Logger.info(">>> Kudos Events watcher is running ...");
+//        Executors.newCachedThreadPool().submit(() -> {
+//            try {
+//                while (true) {
+//                    this.checkKudos();
+//                    Thread.sleep(1000);
+//                }
+//            } catch (Exception e) {
+//                Logger.error(">>> Error: " + e.getMessage());
+//            }
+//        });
+//
+//        Logger.info(">>> Kudos Events watcher is running ...");
     }
 
     private void checkKudos() {

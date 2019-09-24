@@ -11,7 +11,7 @@ import play.libs.Json;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     public User() {
-        this.messaged = Boolean.FALSE;
+        this.kudosQty = 0;
     }
 
     @JsonProperty("_id")
@@ -26,16 +26,12 @@ public class User {
     @JsonProperty
     public Integer kudosQty;
 
-    @JsonProperty
-    public Boolean messaged;
-
     @JsonIgnore
     public Document toDocument() {
         Document doc = new Document("_id", this.id)
                 .append("nickname", this.nickname)
                 .append("fullName", this.fullName)
-                .append("kudosQty", this.kudosQty)
-                .append("messaged", this.messaged);
+                .append("kudosQty", this.kudosQty);
 
         return doc;
     }
@@ -46,7 +42,6 @@ public class User {
         this.nickname = doc.getString("nickname");
         this.fullName = doc.getString("fullName");
         this.kudosQty = doc.getInteger("kudosQty");
-        this.messaged = doc.getBoolean("messaged");
     }
 
     @JsonIgnore

@@ -15,32 +15,32 @@ public class UserEventService {
     @Inject
     public UserEventService(final UsersMessageSender usersMessageSender) {
         this.usersMessageSender = usersMessageSender;
-        this.process();
+//        this.process();
     }
 
-    private void process() {
-        Executors.newCachedThreadPool().submit(() -> {
-            try {
-                while (true) {
-                    this.checkEvents();
-                    Thread.sleep(1000);
-                }
-            } catch (Exception e) {
-                Logger.error(">>> Error: " + e.getMessage());
-            }
-        });
+//    private void process() {
+//        Executors.newCachedThreadPool().submit(() -> {
+//            try {
+//                while (true) {
+//                    this.checkEvents();
+//                    Thread.sleep(1000);
+//                }
+//            } catch (Exception e) {
+//                Logger.error(">>> Error: " + e.getMessage());
+//            }
+//        });
+//
+//        Logger.info(">>> User Events watcher is running ...");
+//    }
 
-        Logger.info(">>> User Events watcher is running ...");
-    }
-
-    public void checkEvents() {
-        List<UserEvent> list = UserEvent.find.all();
-
-        for (UserEvent item: list) {
-            this.sendMessage(MessageType.valueOf(item.type), item.content);
-            item.delete();
-        }
-    }
+//    public void checkEvents() {
+//        List<UserEvent> list = UserEvent.find.all();
+//
+//        for (UserEvent item: list) {
+//            this.sendMessage(MessageType.valueOf(item.type), item.content);
+//            item.delete();
+//        }
+//    }
 
     private void sendMessage(MessageType type, String message) {
         Message msg = new Message();

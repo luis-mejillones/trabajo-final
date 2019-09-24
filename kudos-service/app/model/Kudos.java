@@ -1,7 +1,6 @@
 package model;
 
 import com.datastax.driver.core.Row;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -12,9 +11,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.sql.Timestamp;
-
-import static util.Constants.DATE_FORMAT;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
@@ -43,11 +39,11 @@ public class Kudos {
 
     @JsonProperty
     @Column(name="target_id")
-    public Integer targetId;
+    public String targetId;
 
     @JsonProperty
     @Column(name="source_id")
-    public Integer sourceId;
+    public String sourceId;
 
 //    @JsonIgnore
 //    public Document toDocument() {
@@ -79,8 +75,8 @@ public class Kudos {
         this.date = row.getString("date");
         this.place = row.getString("place");
         this.content = row.getString("content");
-        this.targetId = row.getInt("target_id");
-        this.sourceId = row.getInt("source_id");
+        this.targetId = row.getString("target_id");
+        this.sourceId = row.getString("source_id");
 
     }
 

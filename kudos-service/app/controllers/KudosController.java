@@ -63,6 +63,12 @@ public class KudosController extends Controller {
         return ok();
     }
 
+    public Result deleteByUserId(String userId) {
+        this.service.deleteByUserId(userId);
+
+        return ok();
+    }
+
     public Result testmq() throws Exception {
 //        String QUEUE_NAME = "hello";
 //        ConnectionFactory factory = new ConnectionFactory();

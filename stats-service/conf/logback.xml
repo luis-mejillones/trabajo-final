@@ -4,15 +4,18 @@
   <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-    <file>${application.home:-.}/logs/application.log</file>
+<!--    <file>${application.home:-.}/logs/application.log</file>-->
+    <file>${application.home:-.}/logs/app.log</file>
     <encoder>
-      <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
+<!--      <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>-->
+      <pattern>[%date] %message%n%xException</pattern>
     </encoder>
   </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>
+<!--      <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>-->
+      <pattern>[%date] %message%n%xException</pattern>
     </encoder>
   </appender>
 

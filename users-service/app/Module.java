@@ -20,7 +20,7 @@ public class Module extends AbstractModule {
         // Use the system clock as the default implementation of Clock
         bind(Clock.class).toInstance(Clock.systemDefaultZone());
 
-        bind(KudosMessageReceiver.class).asEagerSingleton();
+//        bind(KudosMessageReceiver.class).asEagerSingleton();
     }
 
 }
