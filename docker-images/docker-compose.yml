@@ -47,7 +47,7 @@ services:
 #      - MYSQL_DATABASE=omega
 #      - MYSQL_ROOT_PASSWORD=12345
   rabbitmq:
-    image: rabbitmq:3.7.17
+    image: rabbitmq:3.7-management
     container_name: rabbitmq
     environment:
       RABBITMQ_ERLANG_COOKIE: SWQOKODSQALRPCLNMEQG
